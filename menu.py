@@ -5,7 +5,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 import customtkinter as ctk
 
-# Importar lógica de otros módulos
+# Importar lógica de otros módulos (INTACTA)
 from tablas import crear_tablas
 from functions import (
     obtener_productos, 
@@ -18,47 +18,56 @@ from functions import (
 )
 
 # ==========================================================================================
-# INTERFAZ GRÁFICA
+# INTERFAZ GRÁFICA - CONFIGURACIÓN VISUAL (MODO OSCURO SUAVE)
 # ==========================================================================================
 
-ctk.set_appearance_mode("System")
+ctk.set_appearance_mode("Dark")  # Cambiamos a modo oscuro
 ctk.set_default_color_theme("blue")
 
-COLOR_SIDEBAR = "#1f2937"
-COLOR_SIDEBAR_BTN_HOVER = "#374151"
-COLOR_ACCENT = "#2563eb"
+# Colores ajustados para modo oscuro basados en tu paleta
+COLOR_SIDEBAR = "#1D1E33"           # Azul oscuro muy profundo (Fondo lateral)
+COLOR_BG_MAIN = "#151626"           # Azul noche profundo (Fondo de la app)
+COLOR_BG_CARD = "#24263E"           # Azul grisáceo oscuro (Tarjetas y tablas)
+COLOR_SIDEBAR_BTN_HOVER = "#7A5C96" # Morado medio (Hover de botones)
+COLOR_ACCENT = "#AA789F"            # Malva (Selecciones y acentos)
+COLOR_HIGHLIGHT = "#F0B4B6"         # Rosa suave (Detalles y textos de ganancia)
+COLOR_TEXT_LIGHT = "#EBEBEB"        # Texto claro para no cansar la vista
 
 
 def configurar_estilo_treeview():
-    """Ajusta el estilo ttk.Treeview para que combine con customtkinter."""
+    """Ajusta el estilo ttk.Treeview para el modo oscuro."""
     style = ttk.Style()
     style.theme_use("clam")
     style.configure(
         "Custom.Treeview",
-        background="#f9fafb",
-        foreground="#111827",
-        fieldbackground="#f9fafb",
-        rowheight=28,
+        background=COLOR_BG_CARD,
+        foreground=COLOR_TEXT_LIGHT,
+        fieldbackground=COLOR_BG_CARD,
+        rowheight=32,  
         borderwidth=0,
         font=("Segoe UI", 10),
     )
     style.configure(
         "Custom.Treeview.Heading",
-        background="#e5e7eb",
-        foreground="#111827",
+        background="#393B6E", # Azul medio de tu paleta
+        foreground="#FFFFFF",
         font=("Segoe UI", 10, "bold"),
         relief="flat",
+        padding=5
     )
-    style.map("Custom.Treeview", background=[("selected", COLOR_ACCENT)], foreground=[("selected", "white")])
+    style.map("Custom.Treeview", 
+              background=[("selected", COLOR_ACCENT)], 
+              foreground=[("selected", "white")])
 
 
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        self.title("Sistema de Gestión de Productos y Ventas")
+        self.title("Sistema de Gestión - Papelería")
         self.geometry("1180x700")
         self.minsize(1000, 600)
+        self.configure(fg_color=COLOR_BG_MAIN) # Fondo principal oscuro
 
         configurar_estilo_treeview()
 
@@ -82,25 +91,26 @@ class App(ctk.CTk):
             messagebox.showerror("Error de Base de Datos", str(e))
 
     def _crear_sidebar(self):
-        self.sidebar = ctk.CTkFrame(self, width=220, corner_radius=0, fg_color=COLOR_SIDEBAR)
+        self.sidebar = ctk.CTkFrame(self, width=240, corner_radius=0, fg_color=COLOR_SIDEBAR)
         self.sidebar.grid(row=0, column=0, sticky="nsew")
         self.sidebar.grid_rowconfigure(8, weight=1)
 
+        # Título de Papelería
         titulo = ctk.CTkLabel(
             self.sidebar,
-            text="📋 Gestión\nde Ventas",
-            font=ctk.CTkFont(size=20, weight="bold"),
+            text="✏️ Papelería\n[Nombre Cliente]",
+            font=ctk.CTkFont(size=22, weight="bold"),
             text_color="white",
             justify="left",
         )
-        titulo.grid(row=0, column=0, padx=20, pady=(25, 30), sticky="w")
+        titulo.grid(row=0, column=0, padx=20, pady=(35, 30), sticky="w")
 
         botones = [
-            ("📊  Dashboard", "dashboard"),
-            ("📦  Productos", "productos"),
-            ("🛒  Ventas (POS)", "ventas"),
-            ("📜  Historial", "historial"),
-            ("📄  Reporte PDF", "reporte"),
+            ("📊  Resumen", "dashboard"),
+            ("📓  Inventario", "productos"),
+            ("🛒  Punto de Venta", "ventas"),
+            ("📜  Registro", "historial"),
+            ("📎  Reportes", "reporte"),
         ]
 
         self.botones_nav = {}
@@ -109,31 +119,33 @@ class App(ctk.CTk):
                 self.sidebar,
                 text=texto,
                 anchor="w",
+                corner_radius=15, 
                 fg_color="transparent",
                 hover_color=COLOR_SIDEBAR_BTN_HOVER,
                 text_color="white",
                 font=ctk.CTkFont(size=14),
-                height=40,
+                height=45,
                 command=lambda k=clave: self.mostrar_vista(k),
             )
-            btn.grid(row=i, column=0, padx=15, pady=4, sticky="ew")
+            btn.grid(row=i, column=0, padx=15, pady=5, sticky="ew")
             self.botones_nav[clave] = btn
 
         btn_salir = ctk.CTkButton(
             self.sidebar,
-            text="🚪  Salir",
+            text="🚪  Salir del Sistema",
             anchor="w",
-            fg_color="#7f1d1d",
-            hover_color="#991b1b",
+            corner_radius=15,
+            fg_color="#A93226", # Rojo oscurecido
+            hover_color="#7B241C",
             text_color="white",
             font=ctk.CTkFont(size=14),
-            height=40,
+            height=45,
             command=self.destroy,
         )
         btn_salir.grid(row=9, column=0, padx=15, pady=(4, 20), sticky="sew")
 
     def _crear_contenedor_vistas(self):
-        self.contenedor = ctk.CTkFrame(self, corner_radius=0, fg_color=("#ffffff", "#1a1a1a"))
+        self.contenedor = ctk.CTkFrame(self, corner_radius=0, fg_color="transparent")
         self.contenedor.grid(row=0, column=1, sticky="nsew")
         self.contenedor.grid_rowconfigure(0, weight=1)
         self.contenedor.grid_columnconfigure(0, weight=1)
@@ -173,42 +185,42 @@ class DashboardFrame(ctk.CTkFrame):
         super().__init__(parent, fg_color="transparent")
         self.app = app
 
-        titulo = ctk.CTkLabel(self, text="Dashboard / Resumen", font=ctk.CTkFont(size=24, weight="bold"))
-        titulo.grid(row=0, column=0, columnspan=4, padx=30, pady=(25, 15), sticky="w")
+        titulo = ctk.CTkLabel(self, text="Resumen de la Papelería", font=ctk.CTkFont(size=26, weight="bold"), text_color=COLOR_TEXT_LIGHT)
+        titulo.grid(row=0, column=0, columnspan=4, padx=30, pady=(35, 20), sticky="w")
 
         self.grid_columnconfigure((0, 1, 2, 3), weight=1)
 
         self.tarjetas = {}
         info_tarjetas = [
-            ("total_productos", "📦 Productos registrados", "#2563eb"),
-            ("total_stock", "📈 Unidades en stock", "#059669"),
-            ("bajo_stock", "⚠️ Productos con stock bajo (≤5)", "#d97706"),
-            ("ventas_mes", "🛒 Ventas este mes", "#7c3aed"),
-            ("total_ventas_mes", "💰 Ingresos del mes", "#16a34a"),
-            ("ganancia_mes", "📊 Ganancia del mes", "#dc2626"),
+            ("total_productos", "📓 Productos registrados", "#393B6E"),
+            ("total_stock", "📦 Unidades en stock", COLOR_SIDEBAR_BTN_HOVER),
+            ("bajo_stock", "⚠️ Productos por agotarse", "#D68910"),
+            ("ventas_mes", "🛒 Ventas este mes", COLOR_ACCENT),
+            ("total_ventas_mes", "💰 Ingresos del mes", "#27AE60"),
+            ("ganancia_mes", "📈 Ganancia del mes", COLOR_HIGHLIGHT),
         ]
 
         for i, (clave, etiqueta, color) in enumerate(info_tarjetas):
             fila = 1 + (i // 3)
             columna = i % 3
-            tarjeta = ctk.CTkFrame(self, corner_radius=12, fg_color=("#f3f4f6", "#262626"))
+            tarjeta = ctk.CTkFrame(self, corner_radius=15, fg_color=COLOR_BG_CARD)
             tarjeta.grid(row=fila, column=columna, padx=15, pady=15, sticky="nsew")
 
-            barra = ctk.CTkFrame(tarjeta, width=6, fg_color=color, corner_radius=0)
-            barra.pack(side="left", fill="y")
+            barra = ctk.CTkFrame(tarjeta, width=8, fg_color=color, corner_radius=15)
+            barra.pack(side="left", fill="y", pady=10, padx=(10,0))
 
             contenido = ctk.CTkFrame(tarjeta, fg_color="transparent")
             contenido.pack(side="left", fill="both", expand=True, padx=15, pady=15)
 
-            lbl_valor = ctk.CTkLabel(contenido, text="--", font=ctk.CTkFont(size=26, weight="bold"))
+            lbl_valor = ctk.CTkLabel(contenido, text="--", font=ctk.CTkFont(size=28, weight="bold"), text_color=COLOR_TEXT_LIGHT)
             lbl_valor.pack(anchor="w")
-            lbl_desc = ctk.CTkLabel(contenido, text=etiqueta, font=ctk.CTkFont(size=13), text_color="gray")
+            lbl_desc = ctk.CTkLabel(contenido, text=etiqueta, font=ctk.CTkFont(size=14), text_color="#AAB7B8")
             lbl_desc.pack(anchor="w")
 
             self.tarjetas[clave] = lbl_valor
 
-        btn_actualizar = ctk.CTkButton(self, text="🔄 Actualizar métricas", command=self.cargar_metricas)
-        btn_actualizar.grid(row=3, column=0, padx=30, pady=15, sticky="w")
+        btn_actualizar = ctk.CTkButton(self, text="🔄 Actualizar métricas", corner_radius=15, fg_color=COLOR_SIDEBAR_BTN_HOVER, command=self.cargar_metricas)
+        btn_actualizar.grid(row=3, column=0, padx=30, pady=20, sticky="w")
 
     def on_show(self):
         self.cargar_metricas()
@@ -230,89 +242,126 @@ class ProductosFrame(ctk.CTkFrame):
         super().__init__(parent, fg_color="transparent")
         self.app = app
         self.producto_seleccionado = None
+        self.todos_los_productos = [] 
 
         self.grid_columnconfigure(0, weight=2)
         self.grid_columnconfigure(1, weight=1)
-        self.grid_rowconfigure(1, weight=1)
+        self.grid_rowconfigure(2, weight=1)
 
-        titulo = ctk.CTkLabel(self, text="Productos", font=ctk.CTkFont(size=24, weight="bold"))
-        titulo.grid(row=0, column=0, columnspan=2, padx=30, pady=(25, 10), sticky="w")
+        titulo = ctk.CTkLabel(self, text="Inventario de Productos", font=ctk.CTkFont(size=26, weight="bold"), text_color=COLOR_TEXT_LIGHT)
+        titulo.grid(row=0, column=0, columnspan=2, padx=30, pady=(35, 10), sticky="w")
 
-        frame_tabla = ctk.CTkFrame(self, fg_color=("#f3f4f6", "#262626"), corner_radius=10)
-        frame_tabla.grid(row=1, column=0, padx=(30, 15), pady=(0, 20), sticky="nsew")
+        # Barra de búsqueda
+        frame_busqueda = ctk.CTkFrame(self, fg_color="transparent")
+        frame_busqueda.grid(row=1, column=0, padx=(30, 15), pady=(0, 10), sticky="ew")
+        
+        self.entry_buscar = ctk.CTkEntry(frame_busqueda, placeholder_text="🔍 Buscar producto por nombre...", corner_radius=15, height=35, fg_color=COLOR_BG_CARD, border_color="#393B6E")
+        self.entry_buscar.pack(side="left", fill="x", expand=True)
+        self.entry_buscar.bind("<KeyRelease>", self._filtrar_productos)
+
+        frame_tabla = ctk.CTkFrame(self, fg_color=COLOR_BG_CARD, corner_radius=15)
+        frame_tabla.grid(row=2, column=0, padx=(30, 15), pady=(0, 25), sticky="nsew")
         frame_tabla.grid_rowconfigure(0, weight=1)
         frame_tabla.grid_columnconfigure(0, weight=1)
 
         columnas = ("id", "nombre", "precio_costo", "cantidad")
         self.tabla = ttk.Treeview(frame_tabla, columns=columnas, show="headings", style="Custom.Treeview")
         self.tabla.heading("id", text="ID")
-        self.tabla.heading("nombre", text="Nombre")
-        self.tabla.heading("precio_costo", text="Precio Costo")
+        self.tabla.heading("nombre", text="Artículo")
+        self.tabla.heading("precio_costo", text="Costo")
         self.tabla.heading("cantidad", text="Stock")
         self.tabla.column("id", width=50, anchor="center")
         self.tabla.column("nombre", width=220)
         self.tabla.column("precio_costo", width=100, anchor="e")
         self.tabla.column("cantidad", width=80, anchor="center")
-        self.tabla.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        self.tabla.grid(row=0, column=0, padx=15, pady=15, sticky="nsew")
         self.tabla.bind("<<TreeviewSelect>>", self._on_seleccionar)
 
         scrollbar = ttk.Scrollbar(frame_tabla, orient="vertical", command=self.tabla.yview)
         self.tabla.configure(yscrollcommand=scrollbar.set)
-        scrollbar.grid(row=0, column=1, sticky="ns", pady=10)
+        scrollbar.grid(row=0, column=1, sticky="ns", pady=15, padx=(0,5))
 
-        btn_refrescar = ctk.CTkButton(frame_tabla, text="🔄 Refrescar", width=120, command=self.cargar_productos)
-        btn_refrescar.grid(row=1, column=0, padx=10, pady=(0, 10), sticky="w")
+        btn_refrescar = ctk.CTkButton(frame_tabla, text="🔄 Refrescar", width=120, corner_radius=15, fg_color=COLOR_SIDEBAR_BTN_HOVER, command=self.cargar_productos)
+        btn_refrescar.grid(row=1, column=0, padx=15, pady=(0, 15), sticky="w")
 
-        frame_form = ctk.CTkFrame(self, fg_color=("#f3f4f6", "#262626"), corner_radius=10)
-        frame_form.grid(row=1, column=1, padx=(0, 30), pady=(0, 20), sticky="nsew")
+        # Formulario
+        frame_form = ctk.CTkFrame(self, fg_color=COLOR_BG_CARD, corner_radius=15)
+        frame_form.grid(row=2, column=1, padx=(0, 30), pady=(0, 25), sticky="nsew")
 
-        lbl_form = ctk.CTkLabel(frame_form, text="Nuevo / Actualizar producto", font=ctk.CTkFont(size=16, weight="bold"))
-        lbl_form.pack(padx=15, pady=(15, 10), anchor="w")
+        lbl_form = ctk.CTkLabel(frame_form, text="Ficha del Producto", font=ctk.CTkFont(size=18, weight="bold"), text_color=COLOR_TEXT_LIGHT)
+        lbl_form.pack(padx=20, pady=(25, 15), anchor="w")
 
-        ctk.CTkLabel(frame_form, text="Nombre:").pack(padx=15, anchor="w")
-        self.entry_nombre = ctk.CTkEntry(frame_form, placeholder_text="Nombre del producto")
-        self.entry_nombre.pack(padx=15, pady=(0, 10), fill="x")
+        ctk.CTkLabel(frame_form, text="Nombre del artículo:").pack(padx=20, anchor="w")
+        self.entry_nombre = ctk.CTkEntry(frame_form, placeholder_text="Ej. Cuaderno Profesional", corner_radius=10, fg_color=COLOR_BG_MAIN, border_width=0)
+        self.entry_nombre.pack(padx=20, pady=(0, 15), fill="x")
 
-        ctk.CTkLabel(frame_form, text="Precio de costo:").pack(padx=15, anchor="w")
-        self.entry_precio = ctk.CTkEntry(frame_form, placeholder_text="0.00")
-        self.entry_precio.pack(padx=15, pady=(0, 10), fill="x")
+        ctk.CTkLabel(frame_form, text="Precio de costo ($):").pack(padx=20, anchor="w")
+        self.entry_precio = ctk.CTkEntry(frame_form, placeholder_text="0.00", corner_radius=10, fg_color=COLOR_BG_MAIN, border_width=0)
+        self.entry_precio.pack(padx=20, pady=(0, 15), fill="x")
 
-        ctk.CTkLabel(frame_form, text="Cantidad / Stock:").pack(padx=15, anchor="w")
-        self.entry_cantidad = ctk.CTkEntry(frame_form, placeholder_text="0")
-        self.entry_cantidad.pack(padx=15, pady=(0, 15), fill="x")
+        ctk.CTkLabel(frame_form, text="Cantidad / Stock:").pack(padx=20, anchor="w")
+        
+        # Botones de ajuste rápido
+        frame_cant = ctk.CTkFrame(frame_form, fg_color="transparent")
+        frame_cant.pack(padx=20, pady=(0, 20), fill="x")
+        
+        btn_menos = ctk.CTkButton(frame_cant, text="-", width=35, corner_radius=10, fg_color=COLOR_ACCENT, hover_color="#8C5C81", text_color="white", command=lambda: self._ajustar_cant(-1))
+        btn_menos.pack(side="left", padx=(0, 5))
+        
+        self.entry_cantidad = ctk.CTkEntry(frame_cant, placeholder_text="0", corner_radius=10, justify="center", fg_color=COLOR_BG_MAIN, border_width=0)
+        self.entry_cantidad.pack(side="left", fill="x", expand=True)
+        
+        btn_mas = ctk.CTkButton(frame_cant, text="+", width=35, corner_radius=10, fg_color=COLOR_ACCENT, hover_color="#8C5C81", text_color="white", command=lambda: self._ajustar_cant(1))
+        btn_mas.pack(side="left", padx=(5, 0))
 
-        self.lbl_id_seleccionado = ctk.CTkLabel(frame_form, text="Ningún producto seleccionado", text_color="gray")
-        self.lbl_id_seleccionado.pack(padx=15, anchor="w")
+        self.lbl_id_seleccionado = ctk.CTkLabel(frame_form, text="📝 Ningún producto seleccionado", text_color="#AAB7B8")
+        self.lbl_id_seleccionado.pack(padx=20, pady=(5,15), anchor="w")
 
-        btn_guardar = ctk.CTkButton(frame_form, text="➕ Registrar nuevo producto", command=self.registrar_producto)
-        btn_guardar.pack(padx=15, pady=(10, 5), fill="x")
+        btn_guardar = ctk.CTkButton(frame_form, text="➕ Registrar Nuevo", corner_radius=15, fg_color="#393B6E", hover_color="#2B2D52", command=self.registrar_producto)
+        btn_guardar.pack(padx=20, pady=(10, 8), fill="x")
 
         btn_actualizar = ctk.CTkButton(
-            frame_form, text="✏️ Actualizar producto seleccionado",
-            fg_color="#d97706", hover_color="#b45309", command=self.actualizar_producto
+            frame_form, text="✏️ Actualizar Seleccionado", corner_radius=15,
+            fg_color=COLOR_SIDEBAR_BTN_HOVER, command=self.actualizar_producto
         )
-        btn_actualizar.pack(padx=15, pady=5, fill="x")
+        btn_actualizar.pack(padx=20, pady=8, fill="x")
 
         btn_limpiar = ctk.CTkButton(
-            frame_form, text="🧹 Limpiar formulario",
-            fg_color="gray30", hover_color="gray20", command=self.limpiar_formulario
+            frame_form, text="🧹 Limpiar Campos", corner_radius=15,
+            fg_color="#34495E", hover_color="#2C3E50", text_color="white", command=self.limpiar_formulario
         )
-        btn_limpiar.pack(padx=15, pady=(5, 15), fill="x")
+        btn_limpiar.pack(padx=20, pady=(8, 20), fill="x")
 
         self.cargar_productos()
+
+    def _ajustar_cant(self, delta):
+        try:
+            actual = int(self.entry_cantidad.get())
+        except ValueError:
+            actual = 0
+        nuevo = max(0, actual + delta)
+        self.entry_cantidad.delete(0, "end")
+        self.entry_cantidad.insert(0, str(nuevo))
 
     def on_show(self):
         self.cargar_productos()
 
     def cargar_productos(self):
-        for item in self.tabla.get_children():
-            self.tabla.delete(item)
         productos = self.app.ejecutar_seguro(obtener_productos)
         if productos is None:
             return
-        for p in productos:
+        self.todos_los_productos = productos
+        self._filtrar_productos() 
+
+    def _filtrar_productos(self, event=None):
+        filtro = self.entry_buscar.get().strip().lower()
+        for item in self.tabla.get_children():
+            self.tabla.delete(item)
+            
+        for p in self.todos_los_productos:
             id_, nombre, precio_costo, cantidad = p
-            self.tabla.insert("", "end", values=(id_, nombre, f"{float(precio_costo):.2f}", cantidad))
+            if filtro in nombre.lower():
+                self.tabla.insert("", "end", values=(id_, nombre, f"{float(precio_costo):.2f}", cantidad))
 
     def _on_seleccionar(self, event):
         seleccion = self.tabla.selection()
@@ -326,15 +375,16 @@ class ProductosFrame(ctk.CTkFrame):
         self.entry_precio.insert(0, valores[2])
         self.entry_cantidad.delete(0, "end")
         self.entry_cantidad.insert(0, valores[3])
-        self.lbl_id_seleccionado.configure(text=f"Editando producto ID: {valores[0]}")
+        self.lbl_id_seleccionado.configure(text=f"📝 Editando ID: {valores[0]}")
 
     def limpiar_formulario(self):
         self.entry_nombre.delete(0, "end")
         self.entry_precio.delete(0, "end")
         self.entry_cantidad.delete(0, "end")
         self.producto_seleccionado = None
-        self.lbl_id_seleccionado.configure(text="Ningún producto seleccionado")
-        self.tabla.selection_remove(self.tabla.selection())
+        self.lbl_id_seleccionado.configure(text="📝 Ningún producto seleccionado")
+        if self.tabla.selection():
+            self.tabla.selection_remove(self.tabla.selection())
 
     def _validar_formulario(self):
         nombre = self.entry_nombre.get().strip()
@@ -391,73 +441,88 @@ class VentasFrame(ctk.CTkFrame):
         super().__init__(parent, fg_color="transparent")
         self.app = app
         self.productos_cache = {}
+        self.todos_los_productos = []
 
         self.grid_columnconfigure(0, weight=2)
-        self.grid_columnconfigure(1, weight=1)
-        self.grid_rowconfigure(1, weight=1)
+        self.grid_columnconfigure(1, weight=2)
+        self.grid_rowconfigure(2, weight=1)
 
-        titulo = ctk.CTkLabel(self, text="Ventas (Punto de Venta)", font=ctk.CTkFont(size=24, weight="bold"))
-        titulo.grid(row=0, column=0, columnspan=2, padx=30, pady=(25, 10), sticky="w")
+        titulo = ctk.CTkLabel(self, text="Punto de Venta", font=ctk.CTkFont(size=26, weight="bold"), text_color=COLOR_TEXT_LIGHT)
+        titulo.grid(row=0, column=0, columnspan=2, padx=30, pady=(35, 10), sticky="w")
 
-        frame_productos = ctk.CTkFrame(self, fg_color=("#f3f4f6", "#262626"), corner_radius=10)
-        frame_productos.grid(row=1, column=0, padx=(30, 15), pady=(0, 10), sticky="nsew")
+        # Barra de búsqueda para caja
+        frame_busqueda = ctk.CTkFrame(self, fg_color="transparent")
+        frame_busqueda.grid(row=1, column=0, padx=(30, 15), pady=(0, 10), sticky="ew")
+        
+        self.entry_buscar_caja = ctk.CTkEntry(frame_busqueda, placeholder_text="🔍 Buscar para vender...", corner_radius=15, height=35, fg_color=COLOR_BG_CARD, border_color="#393B6E")
+        self.entry_buscar_caja.pack(side="left", fill="x", expand=True)
+        self.entry_buscar_caja.bind("<KeyRelease>", self._filtrar_caja)
+
+        # Panel Izquierdo: Productos
+        frame_productos = ctk.CTkFrame(self, fg_color=COLOR_BG_CARD, corner_radius=15)
+        frame_productos.grid(row=2, column=0, padx=(30, 15), pady=(0, 25), sticky="nsew")
         frame_productos.grid_rowconfigure(1, weight=1)
         frame_productos.grid_columnconfigure(0, weight=1)
 
-        ctk.CTkLabel(frame_productos, text="Productos disponibles", font=ctk.CTkFont(size=15, weight="bold")).grid(
-            row=0, column=0, padx=10, pady=(10, 5), sticky="w"
+        ctk.CTkLabel(frame_productos, text="Inventario Disponible", font=ctk.CTkFont(size=16, weight="bold"), text_color=COLOR_TEXT_LIGHT).grid(
+            row=0, column=0, padx=15, pady=(15, 5), sticky="w"
         )
 
         columnas = ("id", "nombre", "precio_costo", "stock")
         self.tabla_productos = ttk.Treeview(frame_productos, columns=columnas, show="headings", style="Custom.Treeview")
         self.tabla_productos.heading("id", text="ID")
-        self.tabla_productos.heading("nombre", text="Nombre")
+        self.tabla_productos.heading("nombre", text="Artículo")
         self.tabla_productos.heading("precio_costo", text="Costo")
         self.tabla_productos.heading("stock", text="Stock")
         self.tabla_productos.column("id", width=50, anchor="center")
-        self.tabla_productos.column("nombre", width=200)
+        self.tabla_productos.column("nombre", width=180)
         self.tabla_productos.column("precio_costo", width=90, anchor="e")
         self.tabla_productos.column("stock", width=70, anchor="center")
-        self.tabla_productos.grid(row=1, column=0, padx=10, pady=5, sticky="nsew")
+        self.tabla_productos.grid(row=1, column=0, padx=15, pady=5, sticky="nsew")
 
         scrollbar1 = ttk.Scrollbar(frame_productos, orient="vertical", command=self.tabla_productos.yview)
         self.tabla_productos.configure(yscrollcommand=scrollbar1.set)
-        scrollbar1.grid(row=1, column=1, sticky="ns", pady=5)
+        scrollbar1.grid(row=1, column=1, sticky="ns", pady=5, padx=(0,5))
 
         frame_agregar = ctk.CTkFrame(frame_productos, fg_color="transparent")
-        frame_agregar.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
-        frame_agregar.grid_columnconfigure((0, 1, 2), weight=1)
+        frame_agregar.grid(row=2, column=0, columnspan=2, padx=15, pady=15, sticky="ew")
+        frame_agregar.grid_columnconfigure(0, weight=1)
+        frame_agregar.grid_columnconfigure(1, weight=1)
 
-        ctk.CTkLabel(frame_agregar, text="Cantidad:").grid(row=0, column=0, sticky="w")
-        self.entry_cant_venta = ctk.CTkEntry(frame_agregar, placeholder_text="Ej. 1")
-        self.entry_cant_venta.grid(row=1, column=0, padx=(0, 5), sticky="ew")
+        # Botones de ajuste para Ventas
+        ctk.CTkLabel(frame_agregar, text="Cantidad a vender:").grid(row=0, column=0, sticky="w", padx=(0, 10))
+        frame_cant = ctk.CTkFrame(frame_agregar, fg_color="transparent")
+        frame_cant.grid(row=1, column=0, sticky="ew", padx=(0, 10))
+        
+        btn_menos_v = ctk.CTkButton(frame_cant, text="-", width=30, corner_radius=10, fg_color=COLOR_ACCENT, hover_color="#8C5C81", text_color="white", command=lambda: self._ajustar_cant_venta(-1))
+        btn_menos_v.pack(side="left", padx=(0, 5))
+        self.entry_cant_venta = ctk.CTkEntry(frame_cant, placeholder_text="1", justify="center", corner_radius=10, fg_color=COLOR_BG_MAIN, border_width=0)
+        self.entry_cant_venta.pack(side="left", fill="x", expand=True)
+        btn_mas_v = ctk.CTkButton(frame_cant, text="+", width=30, corner_radius=10, fg_color=COLOR_ACCENT, hover_color="#8C5C81", text_color="white", command=lambda: self._ajustar_cant_venta(1))
+        btn_mas_v.pack(side="left", padx=(5, 0))
 
-        ctk.CTkLabel(frame_agregar, text="Precio de venta:").grid(row=0, column=1, sticky="w")
-        self.entry_precio_venta = ctk.CTkEntry(frame_agregar, placeholder_text="Ej. 10.00")
-        self.entry_precio_venta.grid(row=1, column=1, padx=5, sticky="ew")
+        ctk.CTkLabel(frame_agregar, text="Precio Público ($):").grid(row=0, column=1, sticky="w")
+        self.entry_precio_venta = ctk.CTkEntry(frame_agregar, placeholder_text="Ej. 15.50", corner_radius=10, fg_color=COLOR_BG_MAIN, border_width=0)
+        self.entry_precio_venta.grid(row=1, column=1, sticky="ew")
 
-        btn_agregar = ctk.CTkButton(frame_agregar, text="➕ Agregar al carrito", command=self.agregar_al_carrito)
-        btn_agregar.grid(row=1, column=2, padx=(5, 0), sticky="ew")
+        btn_agregar = ctk.CTkButton(frame_agregar, text="➡️ Mover al carrito", corner_radius=15, fg_color="#393B6E", hover_color="#2B2D52", command=self.agregar_al_carrito)
+        btn_agregar.grid(row=2, column=0, columnspan=2, pady=(15,0), sticky="ew")
 
-        btn_refrescar_prod = ctk.CTkButton(
-            frame_productos, text="🔄 Refrescar productos", command=self.cargar_productos
-        )
-        btn_refrescar_prod.grid(row=3, column=0, padx=10, pady=(0, 10), sticky="w")
-
-        frame_carrito = ctk.CTkFrame(self, fg_color=("#f3f4f6", "#262626"), corner_radius=10)
-        frame_carrito.grid(row=1, column=1, padx=(0, 30), pady=(0, 10), sticky="nsew")
+        # Panel Derecho: Carrito
+        frame_carrito = ctk.CTkFrame(self, fg_color=COLOR_BG_CARD, corner_radius=15)
+        frame_carrito.grid(row=2, column=1, padx=(0, 30), pady=(0, 25), sticky="nsew")
         frame_carrito.grid_rowconfigure(1, weight=1)
         frame_carrito.grid_columnconfigure(0, weight=1)
 
-        ctk.CTkLabel(frame_carrito, text="🛒 Carrito de venta", font=ctk.CTkFont(size=15, weight="bold")).grid(
-            row=0, column=0, padx=10, pady=(10, 5), sticky="w"
+        ctk.CTkLabel(frame_carrito, text="🛒 Carrito de Compras", font=ctk.CTkFont(size=16, weight="bold"), text_color=COLOR_TEXT_LIGHT).grid(
+            row=0, column=0, padx=15, pady=(15, 5), sticky="w"
         )
 
         columnas_carrito = ("producto", "cantidad", "precio_venta", "subtotal")
         self.tabla_carrito = ttk.Treeview(
             frame_carrito, columns=columnas_carrito, show="headings", style="Custom.Treeview"
         )
-        self.tabla_carrito.heading("producto", text="Producto")
+        self.tabla_carrito.heading("producto", text="Artículo")
         self.tabla_carrito.heading("cantidad", text="Cant.")
         self.tabla_carrito.heading("precio_venta", text="P. Unit.")
         self.tabla_carrito.heading("subtotal", text="Subtotal")
@@ -465,41 +530,61 @@ class VentasFrame(ctk.CTkFrame):
         self.tabla_carrito.column("cantidad", width=50, anchor="center")
         self.tabla_carrito.column("precio_venta", width=70, anchor="e")
         self.tabla_carrito.column("subtotal", width=80, anchor="e")
-        self.tabla_carrito.grid(row=1, column=0, padx=10, pady=5, sticky="nsew")
+        self.tabla_carrito.grid(row=1, column=0, padx=15, pady=5, sticky="nsew")
 
         btn_quitar = ctk.CTkButton(
-            frame_carrito, text="🗑️ Quitar seleccionado", fg_color="gray30", hover_color="gray20",
+            frame_carrito, text="🗑️ Quitar artículo", corner_radius=15,
+            fg_color="#34495E", hover_color="#2C3E50", text_color="white",
             command=self.quitar_del_carrito
         )
-        btn_quitar.grid(row=2, column=0, padx=10, pady=(0, 5), sticky="ew")
+        btn_quitar.grid(row=2, column=0, padx=15, pady=(5, 5), sticky="ew")
 
-        self.lbl_total = ctk.CTkLabel(frame_carrito, text="Total: $0.00", font=ctk.CTkFont(size=18, weight="bold"))
-        self.lbl_total.grid(row=3, column=0, padx=10, pady=10, sticky="e")
+        self.lbl_total = ctk.CTkLabel(frame_carrito, text="Total: $0.00", font=ctk.CTkFont(size=22, weight="bold"), text_color=COLOR_HIGHLIGHT)
+        self.lbl_total.grid(row=3, column=0, padx=15, pady=10, sticky="e")
 
         btn_procesar = ctk.CTkButton(
-            frame_carrito, text="✅ Procesar Venta", fg_color="#16a34a", hover_color="#15803d",
-            font=ctk.CTkFont(size=14, weight="bold"), height=40, command=self.procesar_venta
+            frame_carrito, text="✅ Cobrar Venta", corner_radius=15, 
+            fg_color="#27AE60", hover_color="#1E8449",
+            font=ctk.CTkFont(size=16, weight="bold"), height=50, command=self.procesar_venta
         )
-        btn_procesar.grid(row=4, column=0, padx=10, pady=(0, 10), sticky="ew")
+        btn_procesar.grid(row=4, column=0, padx=15, pady=(0, 20), sticky="ew")
 
         self.cargar_productos()
+
+    def _ajustar_cant_venta(self, delta):
+        try:
+            actual = int(self.entry_cant_venta.get())
+        except ValueError:
+            actual = 0
+        nuevo = max(1, actual + delta)
+        self.entry_cant_venta.delete(0, "end")
+        self.entry_cant_venta.insert(0, str(nuevo))
 
     def on_show(self):
         self.cargar_productos()
 
     def cargar_productos(self):
-        for item in self.tabla_productos.get_children():
-            self.tabla_productos.delete(item)
         productos = self.app.ejecutar_seguro(obtener_productos)
         if productos is None:
             return
+        self.todos_los_productos = productos
         self.productos_cache = {}
         for p in productos:
             id_, nombre, precio_costo, cantidad = p
             self.productos_cache[str(id_)] = {
                 "nombre": nombre, "precio_costo": float(precio_costo), "stock": cantidad
             }
-            self.tabla_productos.insert("", "end", values=(id_, nombre, f"{float(precio_costo):.2f}", cantidad))
+        self._filtrar_caja()
+
+    def _filtrar_caja(self, event=None):
+        filtro = self.entry_buscar_caja.get().strip().lower()
+        for item in self.tabla_productos.get_children():
+            self.tabla_productos.delete(item)
+            
+        for p in self.todos_los_productos:
+            id_, nombre, precio_costo, cantidad = p
+            if filtro in nombre.lower():
+                self.tabla_productos.insert("", "end", values=(id_, nombre, f"{float(precio_costo):.2f}", cantidad))
 
     def agregar_al_carrito(self):
         seleccion = self.tabla_productos.selection()
@@ -605,39 +690,39 @@ class HistorialFrame(ctk.CTkFrame):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(2, weight=1)
 
-        titulo = ctk.CTkLabel(self, text="Historial de Ventas", font=ctk.CTkFont(size=24, weight="bold"))
-        titulo.grid(row=0, column=0, padx=30, pady=(25, 10), sticky="w")
+        titulo = ctk.CTkLabel(self, text="Registro de Ventas", font=ctk.CTkFont(size=26, weight="bold"), text_color=COLOR_TEXT_LIGHT)
+        titulo.grid(row=0, column=0, padx=30, pady=(35, 10), sticky="w")
 
         frame_filtro = ctk.CTkFrame(self, fg_color="transparent")
         frame_filtro.grid(row=1, column=0, padx=30, pady=(0, 10), sticky="ew")
 
-        self.entry_filtro = ctk.CTkEntry(frame_filtro, placeholder_text="Filtrar por nombre de producto...")
-        self.entry_filtro.pack(side="left", padx=(0, 10), fill="x", expand=True)
+        self.entry_filtro = ctk.CTkEntry(frame_filtro, placeholder_text="🔍 Buscar en el historial...", corner_radius=15, height=35, fg_color=COLOR_BG_CARD, border_color="#393B6E")
+        self.entry_filtro.pack(side="left", padx=(0, 15), fill="x", expand=True)
         self.entry_filtro.bind("<KeyRelease>", lambda e: self._aplicar_filtro())
 
-        btn_refrescar = ctk.CTkButton(frame_filtro, text="🔄 Refrescar", width=120, command=self.cargar_historial)
+        btn_refrescar = ctk.CTkButton(frame_filtro, text="🔄 Refrescar", width=120, corner_radius=15, fg_color=COLOR_SIDEBAR_BTN_HOVER, command=self.cargar_historial)
         btn_refrescar.pack(side="left")
 
-        frame_tabla = ctk.CTkFrame(self, fg_color=("#f3f4f6", "#262626"), corner_radius=10)
-        frame_tabla.grid(row=2, column=0, padx=30, pady=(0, 20), sticky="nsew")
+        frame_tabla = ctk.CTkFrame(self, fg_color=COLOR_BG_CARD, corner_radius=15)
+        frame_tabla.grid(row=2, column=0, padx=30, pady=(0, 25), sticky="nsew")
         frame_tabla.grid_rowconfigure(0, weight=1)
         frame_tabla.grid_columnconfigure(0, weight=1)
 
         columnas = ("id_venta", "producto", "cantidad", "precio_unit", "subtotal", "fecha")
         self.tabla = ttk.Treeview(frame_tabla, columns=columnas, show="headings", style="Custom.Treeview")
         titulos = {
-            "id_venta": "ID Venta", "producto": "Producto", "cantidad": "Cant.",
+            "id_venta": "Folio", "producto": "Artículo", "cantidad": "Cant.",
             "precio_unit": "Precio Unit.", "subtotal": "Subtotal", "fecha": "Fecha",
         }
         anchos = {"id_venta": 70, "producto": 220, "cantidad": 60, "precio_unit": 90, "subtotal": 90, "fecha": 150}
         for col in columnas:
             self.tabla.heading(col, text=titulos[col])
             self.tabla.column(col, width=anchos[col], anchor="center" if col != "producto" else "w")
-        self.tabla.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        self.tabla.grid(row=0, column=0, padx=15, pady=15, sticky="nsew")
 
         scrollbar = ttk.Scrollbar(frame_tabla, orient="vertical", command=self.tabla.yview)
         self.tabla.configure(yscrollcommand=scrollbar.set)
-        scrollbar.grid(row=0, column=1, sticky="ns", pady=10)
+        scrollbar.grid(row=0, column=1, sticky="ns", pady=15, padx=(0,5))
 
         self.registros_completos = []
 
@@ -671,37 +756,40 @@ class ReporteFrame(ctk.CTkFrame):
         super().__init__(parent, fg_color="transparent")
         self.app = app
 
-        titulo = ctk.CTkLabel(self, text="Reporte Mensual (PDF)", font=ctk.CTkFont(size=24, weight="bold"))
-        titulo.pack(padx=30, pady=(25, 10), anchor="w")
+        titulo = ctk.CTkLabel(self, text="Reportes y Métricas", font=ctk.CTkFont(size=26, weight="bold"), text_color=COLOR_TEXT_LIGHT)
+        titulo.pack(padx=30, pady=(35, 10), anchor="w")
 
         descripcion = ctk.CTkLabel(
             self,
             text=(
-                "Genera un reporte en PDF con todas las ventas del mes actual,\n"
-                "incluyendo el desglose de precios de entrada, salida y la ganancia total."
+                "Genera un reporte en PDF con todas las ventas del mes actual.\n"
+                "Ideal para entregar balances claros a la administración de la papelería."
             ),
             justify="left",
-            text_color="gray",
+            text_color="#AAB7B8",
+            font=ctk.CTkFont(size=14)
         )
-        descripcion.pack(padx=30, pady=(0, 20), anchor="w")
+        descripcion.pack(padx=30, pady=(0, 25), anchor="w")
 
-        frame_card = ctk.CTkFrame(self, fg_color=("#f3f4f6", "#262626"), corner_radius=12)
+        frame_card = ctk.CTkFrame(self, fg_color=COLOR_BG_CARD, corner_radius=15)
         frame_card.pack(padx=30, pady=10, fill="x")
 
-        ctk.CTkLabel(frame_card, text="📄", font=ctk.CTkFont(size=48)).pack(pady=(20, 5))
+        ctk.CTkLabel(frame_card, text="📄", font=ctk.CTkFont(size=56)).pack(pady=(25, 5))
         ctk.CTkLabel(
             frame_card,
-            text=f"Mes actual: {datetime.now().strftime('%B %Y')}",
-            font=ctk.CTkFont(size=16, weight="bold"),
-        ).pack(pady=(0, 15))
+            text=f"Corte del mes: {datetime.now().strftime('%B %Y')}",
+            font=ctk.CTkFont(size=18, weight="bold"),
+            text_color=COLOR_HIGHLIGHT
+        ).pack(pady=(0, 20))
 
         btn_generar = ctk.CTkButton(
-            frame_card, text="📄 Generar Reporte PDF", height=45,
-            font=ctk.CTkFont(size=14, weight="bold"), command=self.generar_reporte
+            frame_card, text="🖨️ Generar Reporte Mensual (PDF)", height=50, corner_radius=15,
+            fg_color=COLOR_SIDEBAR_BTN_HOVER,
+            font=ctk.CTkFont(size=15, weight="bold"), command=self.generar_reporte
         )
-        btn_generar.pack(padx=20, pady=(0, 20))
+        btn_generar.pack(padx=20, pady=(0, 25))
 
-        self.lbl_estado = ctk.CTkLabel(self, text="", text_color="gray")
+        self.lbl_estado = ctk.CTkLabel(self, text="", text_color="#AAB7B8")
         self.lbl_estado.pack(padx=30, pady=10, anchor="w")
 
     def generar_reporte(self):
@@ -716,7 +804,7 @@ class ReporteFrame(ctk.CTkFrame):
         ruta = filedialog.asksaveasfilename(
             title="Guardar reporte como...",
             defaultextension=".pdf",
-            initialfile=f"reporte_ventas_{mes_actual}.pdf",
+            initialfile=f"Corte_Papeleria_{mes_actual}.pdf",
             filetypes=[("Archivo PDF", "*.pdf")],
         )
         if not ruta:
@@ -724,8 +812,8 @@ class ReporteFrame(ctk.CTkFrame):
 
         resultado = self.app.ejecutar_seguro(generar_reporte_pdf, ruta)
         if resultado:
-            self.lbl_estado.configure(text=f"✅ Reporte generado: {resultado}", text_color="#16a34a")
-            messagebox.showinfo("Reporte generado", f"El reporte se generó exitosamente en:\n{resultado}")
+            self.lbl_estado.configure(text=f"✅ Reporte guardado en: {resultado}", text_color="#27AE60")
+            messagebox.showinfo("Éxito", f"El documento se guardó correctamente.\n\nRuta: {resultado}")
 
 
 # ==========================================================================================
