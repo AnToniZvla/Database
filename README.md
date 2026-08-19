@@ -18,7 +18,8 @@ Aplicación de escritorio moderna desarrollada en Python para la administración
 Asegúrate de tener instalado **Python** (versión 3.10 o superior) en tu equipo. Al instalarlo, recuerda marcar la casilla **"Add Python to PATH"**.
 
 ### 2. Descargar o Clonar el Proyecto
-Descarga el código fuente en tu computadora en una carpeta de tu preferencia.
+Descarga el código fuente en tu computadora en una carpeta de tu preferencia ejecutando
+git clone https://github.com/AnToniZvla/Database
 
 ### 3. Instalar Dependencias
 Abre una terminal (CMD o PowerShell) dentro de la carpeta del proyecto e instala las librerías necesarias con el siguiente comando:
