@@ -1,2 +1,2 @@
 # Database
-Este repositorio es para aprender y entender las funciones basicas de una base de datos en mysql
+Este repositorio es un punto de venta funcional y automatizando la creación de un archivo de donde analizamos las ganancias además de otros datos.
