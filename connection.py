@@ -1,22 +1,22 @@
 import mysql.connector
 from mysql.connector import errorcode
 
+DB_CONFIG = {
+    "host": "localhost",
+    "user": "root",
+    "password": "",
+    "database": "database",
+}
 
 def obtener_conexion():
+    """Devuelve una conexión activa a MySQL o lanza una excepción con un mensaje claro."""
     try:
-        conexion = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="",
-            database="database",
-            use_pure=True
-        )
+        conexion = mysql.connector.connect(use_pure=True, **DB_CONFIG)
         return conexion
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-            print("Algo está mal con tu usuario o contraseña")
+            raise Exception("Algo está mal con tu usuario o contraseña de MySQL.")
         elif err.errno == errorcode.ER_BAD_DB_ERROR:
-            print("La base de datos no existe")
+            raise Exception("La base de datos no existe.")
         else:
-            print("Error al conectar a la base de datos:", err)
-        return None
+            raise Exception(f"Error al conectar a la base de datos: {err}")
