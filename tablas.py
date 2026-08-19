@@ -1,5 +1,5 @@
 import mysql.connector
-from conection import obtener_conexion
+from connection import obtener_conexion
 
 def crear_tablas():
     conexion = obtener_conexion()

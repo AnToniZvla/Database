@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 import mysql.connector
 from fpdf import FPDF
-from conection import obtener_conexion
+from connection import obtener_conexion
 
 
 # ==========================================================================================
